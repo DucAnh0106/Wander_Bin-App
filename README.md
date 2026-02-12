@@ -26,6 +26,10 @@ A mobile-first web prototype for the CRAB-E smart recycling robot, designed for 
 # Install dependencies
 npm install
 
+# Create a .env file with your Gemini API key (get one at https://aistudio.google.com/apikey)
+cp .env.example .env
+# Edit .env and replace your_gemini_api_key_here with your actual key
+
 # Start dev server (with HTTPS for camera)
 npm run dev
 
@@ -35,52 +39,11 @@ npm run build
 
 ## Deploy to GitHub Pages
 
-### Option A: Manual deploy via `gh-pages`
+The project uses **GitHub Actions** to automatically build and deploy on every push to `main`.
 
-```bash
-# 1. Install gh-pages (already in devDependencies)
-npm install
-
-# 2. Update vite.config.js base path to match your repo name:
-#    base: '/YOUR-REPO-NAME/'
-
-# 3. Deploy
-npm run deploy
-```
-
-### Option B: GitHub Actions (recommended)
-
-Create `.github/workflows/deploy.yml`:
-
-```yaml
-name: Deploy to GitHub Pages
-
-on:
-  push:
-    branches: [main]
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: npm ci
-      - run: npm run build
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
-      - uses: actions/deploy-pages@v4
-```
-
-Then go to **Settings → Pages → Source → GitHub Actions**.
+1. Go to **Settings → Pages → Source** and select **GitHub Actions**.
+2. Add your Gemini API key as a repository secret named `VITE_GEMINI_API_KEY` under **Settings → Secrets and variables → Actions**.
+3. Push to `main` — the workflow will build the app with your API key and deploy it automatically.
 
 ### Camera Access
 
@@ -123,7 +86,7 @@ wanderbin/
 
 ## Notes
 
-- **Scan results** are randomized (60% recyclable) for prototype testing
+- **Scan results** use Google Gemini AI (`gemini-2.5-flash`) for item classification
 - **Robot movement** is simulated (Wizard-of-Oz) — no real hardware communication
 - **Camera**: Uses rear camera by default; falls back with clear error message if denied
 - Tested on iOS Safari 15+ and Chrome Android 10+
