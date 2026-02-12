@@ -39,54 +39,11 @@ npm run build
 
 ## Deploy to GitHub Pages
 
-### Option A: Manual deploy via `gh-pages`
+The project uses **GitHub Actions** to automatically build and deploy on every push to `main`.
 
-```bash
-# 1. Install gh-pages (already in devDependencies)
-npm install
-
-# 2. Update vite.config.js base path to match your repo name:
-#    base: '/YOUR-REPO-NAME/'
-
-# 3. Deploy
-npm run deploy
-```
-
-### Option B: GitHub Actions (recommended)
-
-Create `.github/workflows/deploy.yml`:
-
-```yaml
-name: Deploy to GitHub Pages
-
-on:
-  push:
-    branches: [main]
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: npm ci
-      - run: npm run build
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
-      - uses: actions/deploy-pages@v4
-```
-
-Then go to **Settings → Pages → Source → GitHub Actions**.
-
-> **Important:** Add your Gemini API key as a repository secret named `VITE_GEMINI_API_KEY` under **Settings → Secrets and variables → Actions**.
+1. Go to **Settings → Pages → Source** and select **GitHub Actions**.
+2. Add your Gemini API key as a repository secret named `VITE_GEMINI_API_KEY` under **Settings → Secrets and variables → Actions**.
+3. Push to `main` — the workflow will build the app with your API key and deploy it automatically.
 
 ### Camera Access
 
