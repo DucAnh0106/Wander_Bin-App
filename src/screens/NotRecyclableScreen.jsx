@@ -5,7 +5,13 @@ import { vibrate } from '../utils/haptics'
 import LEDFace from '../components/LEDFace'
 import LidAnimation from '../components/LidAnimation'
 
-export default function NotRecyclableScreen({ onScanAgain, onDismiss }) {
+// UPDATED: Now accepts 'itemData' prop
+export default function NotRecyclableScreen({ itemData, onScanAgain, onDismiss }) {
+  
+  // Fallback defaults
+  const itemName = itemData?.itemName || "This item";
+  const reason = itemData?.reason || "It cannot be processed by this bin.";
+
   useEffect(() => {
     playChime('fail')
     vibrate([50, 100, 50])
@@ -14,15 +20,16 @@ export default function NotRecyclableScreen({ onScanAgain, onDismiss }) {
   return (
     <div
       style={{
-        padding: '0 20px',
+        padding: '20px',
         textAlign: 'center',
         minHeight: '100vh',
         background: `linear-gradient(180deg, ${COLORS.redLight} 0%, ${COLORS.white} 50%)`,
         animation: 'fadeUp 0.5s ease',
+        boxSizing: 'border-box'
       }}
     >
       {/* LED Face — sad */}
-      <div style={{ paddingTop: 50 }}>
+      <div style={{ paddingTop: 40 }}>
         <LEDFace expression="sad" size={100} />
       </div>
 
@@ -34,10 +41,10 @@ export default function NotRecyclableScreen({ onScanAgain, onDismiss }) {
           margin: '20px 0 6px',
         }}
       >
-        ❌ Not Recyclable
+        ❌ {itemName}
       </h2>
-      <p style={{ fontSize: 15, color: COLORS.gray600, margin: '0 0 24px' }}>
-        This item cannot be placed in the recycling bin.
+      <p style={{ fontSize: 16, color: COLORS.gray600, margin: '0 0 24px', fontWeight: 500 }}>
+        Not Recyclable
       </p>
 
       {/* Lid stays locked */}
@@ -46,11 +53,12 @@ export default function NotRecyclableScreen({ onScanAgain, onDismiss }) {
       {/* Disposal guidance */}
       <div
         style={{
-          background: COLORS.orangeLight,
+          background: COLORS.orangeLight || '#fff7ed', // Ensure fallback color
           borderRadius: 14,
           padding: '16px 20px',
           margin: '20px 0 28px',
           textAlign: 'left',
+          borderLeft: `4px solid ${COLORS.orange}`
         }}
       >
         <div
@@ -59,14 +67,19 @@ export default function NotRecyclableScreen({ onScanAgain, onDismiss }) {
             fontWeight: 700,
             color: COLORS.orange,
             marginBottom: 6,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
           }}
         >
-          🗑️ Disposal Guidance
+          <span>⚠️</span> Why?
         </div>
-        <p style={{ fontSize: 14, color: COLORS.gray600, margin: 0, lineHeight: 1.5 }}>
-          Please dispose of this item in the <strong>general waste bin</strong>.
-          Common non-recyclable items include food-soiled packaging, styrofoam,
-          and certain plastics.
+        <p style={{ fontSize: 15, color: COLORS.gray600, margin: 0, lineHeight: 1.5 }}>
+          {reason}
+        </p>
+        <hr style={{ border: 'none', borderTop: `1px solid ${COLORS.gray200}`, margin: '12px 0' }} />
+        <p style={{ fontSize: 13, color: COLORS.gray400, margin: 0 }}>
+          Please use the <strong>General Waste</strong> bin instead.
         </p>
       </div>
 
@@ -86,7 +99,7 @@ export default function NotRecyclableScreen({ onScanAgain, onDismiss }) {
             cursor: 'pointer',
           }}
         >
-          🔍 Scan Another
+          Scan Another
         </button>
         <button
           onClick={() => { vibrate(20); onDismiss() }}
@@ -102,7 +115,7 @@ export default function NotRecyclableScreen({ onScanAgain, onDismiss }) {
             cursor: 'pointer',
           }}
         >
-          Dismiss Robot
+          Dismiss
         </button>
       </div>
     </div>

@@ -29,6 +29,9 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          # This tells GitHub: "Take the secret from Settings and give it to Vite"
+          VITE_GEMINI_API_KEY: ${{ secrets.VITE_GEMINI_API_KEY }}
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4

@@ -5,9 +5,14 @@ import { vibrate } from '../utils/haptics'
 import LEDFace from '../components/LEDFace'
 import LidAnimation from '../components/LidAnimation'
 
-export default function RecyclableScreen({ onScanAgain, onDismiss }) {
+// UPDATED: Now accepts 'itemData' prop
+export default function RecyclableScreen({ itemData, onScanAgain, onDismiss }) {
   const [lidOpen, setLidOpen] = useState(false)
   const [disposed, setDisposed] = useState(false)
+
+  // Fallback defaults in case data is missing
+  const itemName = itemData?.itemName || "This item";
+  const reason = itemData?.reason || "It is clean and recyclable.";
 
   useEffect(() => {
     playChime('success')
@@ -23,15 +28,16 @@ export default function RecyclableScreen({ onScanAgain, onDismiss }) {
   return (
     <div
       style={{
-        padding: '0 20px',
+        padding: '20px', // Added top padding for better spacing
         textAlign: 'center',
         minHeight: '100vh',
         background: `linear-gradient(180deg, ${COLORS.greenLight} 0%, ${COLORS.white} 50%)`,
         animation: 'fadeUp 0.5s ease',
+        boxSizing: 'border-box'
       }}
     >
       {/* LED Face */}
-      <div style={{ paddingTop: 50 }}>
+      <div style={{ paddingTop: 40 }}>
         <LEDFace expression="happy" size={100} />
       </div>
 
@@ -43,10 +49,10 @@ export default function RecyclableScreen({ onScanAgain, onDismiss }) {
           margin: '20px 0 6px',
         }}
       >
-        ✅ This item is recyclable!
+        ✅ {itemName} is Recyclable!
       </h2>
-      <p style={{ fontSize: 15, color: COLORS.gray600, margin: '0 0 28px' }}>
-        Great job identifying a recyclable item.
+      <p style={{ fontSize: 16, color: COLORS.gray600, margin: '0 0 28px', lineHeight: 1.5 }}>
+        {reason}
       </p>
 
       {/* ── Pre-disposal: wave to open lid ── */}
@@ -56,18 +62,19 @@ export default function RecyclableScreen({ onScanAgain, onDismiss }) {
 
           {!lidOpen ? (
             <>
-              <p
+              <div
                 style={{
-                  fontSize: 14,
-                  color: COLORS.gray600,
                   margin: '20px 0 16px',
-                  background: COLORS.blueLight,
+                  background: COLORS.blueLight, // Verify this color exists in your utils
                   padding: '12px 16px',
                   borderRadius: 12,
                 }}
               >
-                👋 Wave your hand near the bin to open the lid
-              </p>
+                 <p style={{ fontSize: 14, color: COLORS.navy, margin: 0 }}>
+                  👋 Wave your hand near the bin to open the lid
+                 </p>
+              </div>
+              
               <button
                 onClick={handleWave}
                 style={{
@@ -84,7 +91,7 @@ export default function RecyclableScreen({ onScanAgain, onDismiss }) {
                   boxShadow: '0 4px 20px rgba(34,197,94,0.35)',
                 }}
               >
-                👋 Wave to Open Lid
+                Open Lid
               </button>
             </>
           ) : (
@@ -122,7 +129,7 @@ export default function RecyclableScreen({ onScanAgain, onDismiss }) {
                 margin: 0,
               }}
             >
-              Item disposed! Thank you for recycling.
+              Thank you for recycling!
             </p>
           </div>
 
@@ -141,7 +148,7 @@ export default function RecyclableScreen({ onScanAgain, onDismiss }) {
                 cursor: 'pointer',
               }}
             >
-              🔍 Scan Another
+              Scan Another
             </button>
             <button
               onClick={() => { vibrate(20); onDismiss() }}
@@ -157,7 +164,7 @@ export default function RecyclableScreen({ onScanAgain, onDismiss }) {
                 cursor: 'pointer',
               }}
             >
-              Dismiss Robot
+              Dismiss
             </button>
           </div>
         </div>

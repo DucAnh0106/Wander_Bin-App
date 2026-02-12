@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import COLORS from './utils/colors'
+import COLORS from './utils/colors' // Verify this path matches your structure
 
 // Screens
 import HomeScreen from './screens/HomeScreen'
@@ -21,6 +21,12 @@ const SCREENS = {
 export default function App() {
   const [screen, setScreen] = useState(SCREENS.HOME)
   const [selectedBot, setSelectedBot] = useState(null)
+  
+  // NEW: State to store Gemini's analysis results
+  const [scanResult, setScanResult] = useState({ 
+    itemName: 'Unknown Item', 
+    reason: 'Analysis unavailable' 
+  })
 
   // ── Navigation handlers ──
   const handleSummon = (bot) => {
@@ -30,8 +36,20 @@ export default function App() {
 
   const handleArrived = () => setScreen(SCREENS.SCAN)
 
-  const handleScanResult = (recyclable) => {
-    setScreen(recyclable ? SCREENS.RECYCLABLE : SCREENS.NOT_RECYCLABLE)
+  // UPDATED: Now receives the full result object from ScanScreen
+  const handleScanResult = (result) => {
+    // 1. Store the AI's findings so we can show them on the next screen
+    setScanResult({
+      itemName: result.itemName || "Unknown Item",
+      reason: result.reason || "No reason provided."
+    })
+
+    // 2. Navigate based on recyclability boolean
+    if (result.isRecyclable) {
+      setScreen(SCREENS.RECYCLABLE)
+    } else {
+      setScreen(SCREENS.NOT_RECYCLABLE)
+    }
   }
 
   const handleScanAgain = () => setScreen(SCREENS.SCAN)
@@ -100,6 +118,7 @@ export default function App() {
       {screen === SCREENS.HOME && (
         <HomeScreen onSummon={handleSummon} />
       )}
+      
       {screen === SCREENS.EN_ROUTE && (
         <EnRouteScreen
           bot={selectedBot}
@@ -107,21 +126,28 @@ export default function App() {
           onCancel={handleCancel}
         />
       )}
+      
       {screen === SCREENS.SCAN && (
         <ScanScreen onResult={handleScanResult} />
       )}
+      
+      {/* UPDATED: Passing the AI data to result screens */}
       {screen === SCREENS.RECYCLABLE && (
         <RecyclableScreen
+          itemData={scanResult} // Pass the name/reason here
           onScanAgain={handleScanAgain}
           onDismiss={handleDismiss}
         />
       )}
+      
       {screen === SCREENS.NOT_RECYCLABLE && (
         <NotRecyclableScreen
+          itemData={scanResult} // Pass the name/reason here
           onScanAgain={handleScanAgain}
           onDismiss={handleDismiss}
         />
       )}
+      
       {screen === SCREENS.DEPARTURE && (
         <DepartureScreen onComplete={handleDepartureComplete} />
       )}
