@@ -26,6 +26,10 @@ A mobile-first web prototype for the CRAB-E smart recycling robot, designed for 
 # Install dependencies
 npm install
 
+# Create a .env file with your Gemini API key (get one at https://aistudio.google.com/apikey)
+cp .env.example .env
+# Edit .env and replace your_gemini_api_key_here with your actual key
+
 # Start dev server (with HTTPS for camera)
 npm run dev
 
@@ -82,6 +86,8 @@ jobs:
 
 Then go to **Settings → Pages → Source → GitHub Actions**.
 
+> **Important:** Add your Gemini API key as a repository secret named `GEMINI_API_KEY` under **Settings → Secrets and variables → Actions**.
+
 ### Camera Access
 
 ✅ **GitHub Pages serves over HTTPS** — camera access (`getUserMedia`) works out of the box.
@@ -123,7 +129,7 @@ wanderbin/
 
 ## Notes
 
-- **Scan results** are randomized (60% recyclable) for prototype testing
+- **Scan results** use Google Gemini AI (`gemini-2.5-flash`) for item classification
 - **Robot movement** is simulated (Wizard-of-Oz) — no real hardware communication
 - **Camera**: Uses rear camera by default; falls back with clear error message if denied
 - Tested on iOS Safari 15+ and Chrome Android 10+
