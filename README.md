@@ -86,7 +86,7 @@ jobs:
 
 Then go to **Settings → Pages → Source → GitHub Actions**.
 
-> **Important:** Add your Gemini API key as a repository secret named `GEMINI_API_KEY` under **Settings → Secrets and variables → Actions**.
+> **Important:** Add your Gemini API key as a repository secret named `VITE_GEMINI_API_KEY` under **Settings → Secrets and variables → Actions**.
 
 ### Camera Access
 
