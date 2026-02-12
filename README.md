@@ -15,6 +15,7 @@ A mobile-first web prototype for the CRAB-E smart recycling robot, designed for 
 ## Tech Stack
 
 - **React 18** + **Vite** — fast dev and build
+- **Google Gemini AI** (`@google/generative-ai`) — image-based recyclable detection
 - **CSS-in-JS** (inline styles) — no external CSS framework needed
 - **Web Audio API** — synthesized sound effects
 - **getUserMedia** — device camera access (requires HTTPS)
@@ -67,6 +68,8 @@ wanderbin/
     │   ├── colors.js           # CRAB-E color palette tokens
     │   ├── sounds.js           # Web Audio API chimes
     │   └── haptics.js          # Vibration API wrapper
+    ├── services/
+    │   └── gemini.js           # Google Gemini AI recyclable detection
     ├── components/
     │   ├── LEDFace.jsx         # Animated emoticon face (5 expressions)
     │   ├── CrabBot.jsx         # SVG crab robot illustration
