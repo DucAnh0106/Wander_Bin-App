@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import COLORS from './utils/colors' // Verify this path matches your structure
+import { sendLidCommand } from './services/esp32'
 
 // Screens
 import HomeScreen from './screens/HomeScreen'
@@ -37,12 +38,19 @@ export default function App() {
   const handleArrived = () => setScreen(SCREENS.SCAN)
 
   // UPDATED: Now receives the full result object from ScanScreen
-  const handleScanResult = (result) => {
+  const handleScanResult = async (result) => {
     // 1. Store the AI's findings so we can show them on the next screen
     setScanResult({
       itemName: result.itemName || "Unknown Item",
       reason: result.reason || "No reason provided."
     })
+
+    // Send command to ESP32 (mock server in dev, real ESP32 in production)
+    await sendLidCommand(
+      result.isRecyclable,
+      result.itemName,
+      result.reason
+    )
 
     // 2. Navigate based on recyclability boolean
     if (result.isRecyclable) {
