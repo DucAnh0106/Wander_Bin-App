@@ -58,12 +58,9 @@ export async function sendLidCommand(isRecyclable, itemName, reason) {
 
     console.log('[ESP32] Sending lid command to:', url)
 
-    // Use text/plain to avoid CORS preflight (OPTIONS request) which most
-    // ESP32 / simple HTTP servers do not handle.  The body is still JSON —
-    // the server just needs to parse it from a text/plain content-type.
     const response = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'text/plain' },
+      headers: { 'Content-Type': 'application/json' },
       body: payload,
     })
 
