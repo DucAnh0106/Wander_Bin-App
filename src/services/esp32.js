@@ -1,15 +1,40 @@
 // src/services/esp32.js
 
-function getESP32Url() {
-  const url = import.meta.env.VITE_ESP32_URL
-  if (!url) {
-    console.warn(
-      'VITE_ESP32_URL is not set. Falling back to http://localhost:3001. ' +
-        'Set it in your .env file for local dev or as a GitHub secret for deployment.'
-    )
-    return 'http://localhost:3001'
+let _cachedUrl = null
+
+async function getESP32Url() {
+  if (_cachedUrl) return _cachedUrl
+
+  // Try loading the runtime config (generated during CI from GitHub secrets).
+  // This file is fetched fresh on every page load to pick up secret changes
+  // without relying on Vite's build-time env injection.
+  try {
+    const base = import.meta.env.BASE_URL || '/'
+    const response = await fetch(`${base}env-config.json?v=${Date.now()}`)
+    if (response.ok) {
+      const config = await response.json()
+      if (config.VITE_ESP32_URL) {
+        _cachedUrl = config.VITE_ESP32_URL
+        return _cachedUrl
+      }
+    }
+  } catch (e) {
+    console.warn('Could not load runtime config:', e.message)
   }
-  return url
+
+  // Fallback to build-time env var (for local development with .env file)
+  const url = import.meta.env.VITE_ESP32_URL
+  if (url) {
+    _cachedUrl = url
+    return _cachedUrl
+  }
+
+  console.warn(
+    'VITE_ESP32_URL is not set. Falling back to http://localhost:3001. ' +
+      'Set it in your .env file for local dev or as a GitHub secret for deployment.'
+  )
+  _cachedUrl = 'http://localhost:3001'
+  return _cachedUrl
 }
 
 /**
@@ -21,7 +46,8 @@ function getESP32Url() {
  */
 export async function sendLidCommand(isRecyclable, itemName, reason) {
   try {
-    const response = await fetch(`${getESP32Url()}/lid-control`, {
+    const esp32Url = await getESP32Url()
+    const response = await fetch(`${esp32Url}/lid-control`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -51,7 +77,8 @@ export async function sendLidCommand(isRecyclable, itemName, reason) {
  */
 export async function getESP32Status() {
   try {
-    const response = await fetch(`${getESP32Url()}/status`, {
+    const esp32Url = await getESP32Url()
+    const response = await fetch(`${esp32Url}/status`, {
       method: 'GET',
     })
 
