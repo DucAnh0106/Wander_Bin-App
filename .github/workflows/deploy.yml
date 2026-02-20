@@ -3,6 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -31,6 +32,12 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Generate runtime config
+        run: |
+          echo '{"VITE_ESP32_URL":"'"$VITE_ESP32_URL"'"}' > public/env-config.json
+        env:
+          VITE_ESP32_URL: ${{ secrets.VITE_ESP32_URL }}
 
       - name: Build
         run: npm run build
