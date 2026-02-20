@@ -57,8 +57,7 @@ Open the `.env` file and fill in your values:
 VITE_GEMINI_API_KEY=your_gemini_api_key_here
 
 # Optional — URL of the ESP32 lid-control server (defaults to http://localhost:3001)
-# Either name works: VITE_ESP_URL or VITE_ESP32_URL
-VITE_ESP_URL=http://localhost:3001
+VITE_ESP32_URL=http://localhost:3001
 ```
 
 > **Note:** The app works without an ESP32 server — lid commands will simply log a warning to the console if the server is unreachable.
@@ -90,10 +89,12 @@ The project uses **GitHub Actions** to automatically build and deploy on every p
 
 1. Go to **Settings → Pages → Source** and select **GitHub Actions**.
 2. Add your Gemini API key as a repository secret named `VITE_GEMINI_API_KEY` under **Settings → Secrets and variables → Actions**.
-3. Add your ESP32 server URL as a repository secret named `VITE_ESP_URL` (or `VITE_ESP32_URL` — both work) under **Settings → Secrets and variables → Actions**.
+3. Add your ESP32 server URL as a repository secret named `VITE_ESP32_URL` under **Settings → Secrets and variables → Actions**.
 4. Push to `main` — the workflow will build the app with your API key and deploy it automatically.
 
-> **Tip:** After updating the `VITE_ESP_URL` secret, go to **Actions → Deploy to GitHub Pages → Run workflow** to redeploy with the new URL.
+> **Updating the ESP32 URL:** Whenever you change the `VITE_ESP32_URL` secret, go to **Actions → Deploy to GitHub Pages → Run workflow** to redeploy. The app reads the URL from a runtime config file (`env-config.json`), so every page load picks up the latest URL without any code changes.
+>
+> **⚠️ HTTPS required:** GitHub Pages is served over HTTPS. Browsers block requests from HTTPS pages to plain HTTP servers (mixed content). Make sure your ESP32 URL uses **HTTPS** — for example, expose it via [ngrok](https://ngrok.com/) (`https://xxxx.ngrok-free.app`) or a Cloudflare Tunnel.
 
 ### Camera Access
 
@@ -147,6 +148,8 @@ Wander_Bin-App/
 | Camera not working | Make sure you're on `localhost` or HTTPS; check browser permissions |
 | Scan returns no results | Verify `VITE_GEMINI_API_KEY` is set correctly in your `.env` file |
 | ESP32 warnings in console | This is normal if you don't have an ESP32 server running — the app still works |
+| ESP32 requests not reaching server | Open browser DevTools → Console and look for `[ESP32]` logs. Verify the URL is correct. If deploying on GitHub Pages, the ESP32 URL **must** be HTTPS (use ngrok or similar). |
+| `[ESP32] lid-control failed: Failed to fetch` | Mixed-content or CORS error — make sure the ESP32 URL is HTTPS and the server allows cross-origin requests. |
 
 ## Notes
 

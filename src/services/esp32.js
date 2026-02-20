@@ -14,23 +14,25 @@ async function getESP32Url() {
     if (response.ok) {
       const config = await response.json()
       if (config.VITE_ESP32_URL) {
+        console.log('[ESP32] Using runtime config URL:', config.VITE_ESP32_URL)
         _cachedUrl = config.VITE_ESP32_URL
         return _cachedUrl
       }
     }
   } catch (e) {
-    console.warn('Could not load runtime config:', e.message)
+    console.warn('[ESP32] Could not load runtime config:', e.message)
   }
 
   // Fallback to build-time env var (for local development with .env file)
-  const url = import.meta.env.VITE_ESP32_URL || import.meta.env.VITE_ESP_URL
+  const url = import.meta.env.VITE_ESP32_URL
   if (url) {
+    console.log('[ESP32] Using build-time env URL:', url)
     _cachedUrl = url
     return _cachedUrl
   }
 
   console.warn(
-    'VITE_ESP32_URL is not set. Falling back to http://localhost:3001. ' +
+    '[ESP32] VITE_ESP32_URL is not set. Falling back to http://localhost:3001. ' +
       'Set it in your .env file for local dev or as a GitHub secret for deployment.'
   )
   _cachedUrl = 'http://localhost:3001'
@@ -47,26 +49,38 @@ async function getESP32Url() {
 export async function sendLidCommand(isRecyclable, itemName, reason) {
   try {
     const esp32Url = await getESP32Url()
-    const response = await fetch(`${esp32Url}/lid-control`, {
+    const url = `${esp32Url}/lid-control`
+    const payload = JSON.stringify({
+      allowOpen: isRecyclable,
+      itemName,
+      reason,
+    })
+
+    console.log('[ESP32] Sending lid command to:', url)
+
+    // Use text/plain to avoid CORS preflight (OPTIONS request) which most
+    // ESP32 / simple HTTP servers do not handle.  The body is still JSON —
+    // the server just needs to parse it from a text/plain content-type.
+    const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        allowOpen: isRecyclable,
-        itemName,
-        reason,
-      }),
+      headers: { 'Content-Type': 'text/plain' },
+      body: payload,
     })
 
     if (!response.ok) {
-      console.warn(`ESP32 lid-control returned status ${response.status}`)
+      console.warn(`[ESP32] lid-control returned status ${response.status}`)
       return null
     }
 
     return await response.json()
   } catch (error) {
-    console.warn('ESP32 lid-control failed (server may be offline):', error.message)
+    console.warn('[ESP32] lid-control failed:', error.message)
+    if (error instanceof TypeError) {
+      console.warn(
+        '[ESP32] This is likely a network/CORS error. If deploying on HTTPS (e.g. GitHub Pages), ' +
+          'make sure your ESP32 URL also uses HTTPS (e.g. via ngrok or Cloudflare Tunnel).'
+      )
+    }
     return null
   }
 }
@@ -83,13 +97,13 @@ export async function getESP32Status() {
     })
 
     if (!response.ok) {
-      console.warn(`ESP32 status returned status ${response.status}`)
+      console.warn(`[ESP32] status returned status ${response.status}`)
       return null
     }
 
     return await response.json()
   } catch (error) {
-    console.warn('ESP32 status failed (server may be offline):', error.message)
+    console.warn('[ESP32] status failed (server may be offline):', error.message)
     return null
   }
 }
