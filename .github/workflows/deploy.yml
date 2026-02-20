@@ -36,6 +36,7 @@ jobs:
         run: npm run build
         env:
           VITE_GEMINI_API_KEY: ${{ secrets.VITE_GEMINI_API_KEY }}
+          VITE_ESP32_URL: ${{ secrets.VITE_ESP32_URL }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
