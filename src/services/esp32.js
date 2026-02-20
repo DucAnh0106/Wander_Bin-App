@@ -23,7 +23,7 @@ async function getESP32Url() {
   }
 
   // Fallback to build-time env var (for local development with .env file)
-  const url = import.meta.env.VITE_ESP32_URL
+  const url = import.meta.env.VITE_ESP32_URL || import.meta.env.VITE_ESP_URL
   if (url) {
     _cachedUrl = url
     return _cachedUrl

@@ -57,7 +57,8 @@ Open the `.env` file and fill in your values:
 VITE_GEMINI_API_KEY=your_gemini_api_key_here
 
 # Optional — URL of the ESP32 lid-control server (defaults to http://localhost:3001)
-VITE_ESP32_URL=http://localhost:3001
+# Either name works: VITE_ESP_URL or VITE_ESP32_URL
+VITE_ESP_URL=http://localhost:3001
 ```
 
 > **Note:** The app works without an ESP32 server — lid commands will simply log a warning to the console if the server is unreachable.
@@ -89,7 +90,10 @@ The project uses **GitHub Actions** to automatically build and deploy on every p
 
 1. Go to **Settings → Pages → Source** and select **GitHub Actions**.
 2. Add your Gemini API key as a repository secret named `VITE_GEMINI_API_KEY` under **Settings → Secrets and variables → Actions**.
-3. Push to `main` — the workflow will build the app with your API key and deploy it automatically.
+3. Add your ESP32 server URL as a repository secret named `VITE_ESP_URL` (or `VITE_ESP32_URL` — both work) under **Settings → Secrets and variables → Actions**.
+4. Push to `main` — the workflow will build the app with your API key and deploy it automatically.
+
+> **Tip:** After updating the `VITE_ESP_URL` secret, go to **Actions → Deploy to GitHub Pages → Run workflow** to redeploy with the new URL.
 
 ### Camera Access
 

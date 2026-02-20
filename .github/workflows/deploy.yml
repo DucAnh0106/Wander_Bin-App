@@ -36,13 +36,13 @@ jobs:
       - name: Generate runtime config
         run: jq -n --arg url "$VITE_ESP32_URL" '{"VITE_ESP32_URL":$url}' > public/env-config.json
         env:
-          VITE_ESP32_URL: ${{ secrets.VITE_ESP32_URL }}
+          VITE_ESP32_URL: ${{ secrets.VITE_ESP_URL || secrets.VITE_ESP32_URL }}
 
       - name: Build
         run: npm run build
         env:
           VITE_GEMINI_API_KEY: ${{ secrets.VITE_GEMINI_API_KEY }}
-          VITE_ESP32_URL: ${{ secrets.VITE_ESP32_URL }}
+          VITE_ESP32_URL: ${{ secrets.VITE_ESP_URL || secrets.VITE_ESP32_URL }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
