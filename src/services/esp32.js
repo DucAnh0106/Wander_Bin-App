@@ -3,7 +3,7 @@
 let _cachedUrl = null
 
 async function getESP32Url() {
-  if (_cachedUrl !== null) return _cachedUrl
+  if (_cachedUrl) return _cachedUrl
 
   // Try loading the runtime config (generated during CI from GitHub secrets).
   // This file is fetched fresh on every page load to pick up secret changes

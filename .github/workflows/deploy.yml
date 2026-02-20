@@ -34,8 +34,7 @@ jobs:
         run: npm ci
 
       - name: Generate runtime config
-        run: |
-          echo '{"VITE_ESP32_URL":"'"$VITE_ESP32_URL"'"}' > public/env-config.json
+        run: jq -n --arg url "$VITE_ESP32_URL" '{"VITE_ESP32_URL":$url}' > public/env-config.json
         env:
           VITE_ESP32_URL: ${{ secrets.VITE_ESP32_URL }}
 
