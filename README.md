@@ -14,28 +14,73 @@ A mobile-first web prototype for the CRAB-E smart recycling robot, designed for 
 
 ## Tech Stack
 
-- **React 18** + **Vite** — fast dev and build
+- **React 18** + **Vite 5** — fast dev and build
 - **Google Gemini AI** (`@google/generative-ai`) — image-based recyclable detection
+- **ESP32 integration** — lid control commands over HTTP (optional hardware)
 - **CSS-in-JS** (inline styles) — no external CSS framework needed
 - **Web Audio API** — synthesized sound effects
-- **getUserMedia** — device camera access (requires HTTPS)
+- **getUserMedia** — device camera access (requires a secure context: HTTPS or `localhost`)
 - **Vibration API** — haptic feedback on supported devices
+
+## Prerequisites
+
+- **Node.js 18+** (tested with Node 20) — [download](https://nodejs.org/)
+- **npm** (comes with Node.js)
+- **Git** — [download](https://git-scm.com/)
+- A **Google Gemini API key** — [get one free](https://aistudio.google.com/apikey)
 
 ## Quick Start
 
+### 1. Clone the repository
+
 ```bash
-# Install dependencies
+git clone https://github.com/DucAnh0106/Wander_Bin-App.git
+cd Wander_Bin-App
+```
+
+### 2. Install dependencies
+
+```bash
 npm install
+```
 
-# Create a .env file with your Gemini API key (get one at https://aistudio.google.com/apikey)
+### 3. Set up environment variables
+
+```bash
 cp .env.example .env
-# Edit .env and replace your_gemini_api_key_here with your actual key
+```
 
-# Start dev server (with HTTPS for camera)
+Open the `.env` file and fill in your values:
+
+```dotenv
+# Required — your Gemini API key for AI-powered scan results
+VITE_GEMINI_API_KEY=your_gemini_api_key_here
+
+# Optional — URL of the ESP32 lid-control server (defaults to http://localhost:3001)
+VITE_ESP32_URL=http://localhost:3001
+```
+
+> **Note:** The app works without an ESP32 server — lid commands will simply log a warning to the console if the server is unreachable.
+
+### 4. Start the development server
+
+```bash
 npm run dev
+```
 
-# Build for production
-npm run build
+Then open the URL shown in the terminal. Because `vite.config.js` sets `base: '/Wander_Bin-App/'` (for GitHub Pages), the local dev URL will be:
+
+```
+http://localhost:5173/Wander_Bin-App/
+```
+
+> **Camera access:** Browsers treat `localhost` as a secure context, so camera (`getUserMedia`) works without HTTPS during local development.
+
+### 5. Build for production (optional)
+
+```bash
+npm run build    # outputs to dist/
+npm run preview  # preview the production build locally
 ```
 
 ## Deploy to GitHub Pages
@@ -55,10 +100,11 @@ The project uses **GitHub Actions** to automatically build and deploy on every p
 ## Project Structure
 
 ```
-wanderbin/
+Wander_Bin-App/
 ├── index.html                  # Entry HTML
-├── vite.config.js              # Vite config (set base for GH Pages)
+├── vite.config.js              # Vite config (base path set for GitHub Pages)
 ├── package.json
+├── .env.example                # Template for environment variables
 └── src/
     ├── main.jsx                # React root
     ├── App.jsx                 # Screen router + state
@@ -69,7 +115,8 @@ wanderbin/
     │   ├── sounds.js           # Web Audio API chimes
     │   └── haptics.js          # Vibration API wrapper
     ├── services/
-    │   └── gemini.js           # Google Gemini AI recyclable detection
+    │   ├── gemini.js           # Google Gemini AI recyclable detection
+    │   └── esp32.js            # ESP32 lid-control HTTP client
     ├── components/
     │   ├── LEDFace.jsx         # Animated emoticon face (5 expressions)
     │   ├── CrabBot.jsx         # SVG crab robot illustration
@@ -86,6 +133,16 @@ wanderbin/
         ├── NotRecyclableScreen.jsx # ❌ Reject flow
         └── DepartureScreen.jsx     # Robot returns to base
 ```
+
+## Troubleshooting
+
+| Problem | Solution |
+|---|---|
+| `npm install` fails | Make sure you have Node.js 18+ installed (`node -v` to check) |
+| App shows blank page at `localhost:5173` | Navigate to `localhost:5173/Wander_Bin-App/` instead (note the trailing slash) |
+| Camera not working | Make sure you're on `localhost` or HTTPS; check browser permissions |
+| Scan returns no results | Verify `VITE_GEMINI_API_KEY` is set correctly in your `.env` file |
+| ESP32 warnings in console | This is normal if you don't have an ESP32 server running — the app still works |
 
 ## Notes
 
