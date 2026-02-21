@@ -1,6 +1,5 @@
 // src/services/esp32.js
-const ESP32_URL = import.meta.env.VITE_ESP32_URL || 'http://localhost:3001'
-
+const ESP32_URL = (import.meta.env.VITE_ESP32_URL || 'http://localhost:3001').replace(/\/+$/, '')
 /**
  * Sends a command to the ESP32 to allow or disallow the lid to open
  * @param {boolean} isRecyclable - Whether the item is recyclable
